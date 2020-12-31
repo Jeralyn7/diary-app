@@ -9,6 +9,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .pointer {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -16,8 +21,7 @@
             <div class="row justify-content-center" style="margin-top: 100px">
                 <div class="col-md-5">
                     <div class="d-flex align-items-center pointer position-absolute " @click="redirectToProfile">
-                        <span uk-icon="icon: arrow-left; ratio: 1"></span>
-                        <span>&nbsp;Go back</span>
+                        <span class="text-secondary pointer">&nbsp;Return to profile</span>
                     </div>
                     <form @submit.prevent="postDiary" class="mt-5">
                         <div class="form-group">
@@ -40,9 +44,6 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit-icons.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>

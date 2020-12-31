@@ -132,9 +132,10 @@
                             <i v-if="playing" class="fas fa-pause mr-3 text-secondary pointer" style="font-size: 13px;" @click="handler('MUSICCONTROL', { event: 'pause'})"></i>
                             <i v-if="!playing" class="fas fa-play mr-3 text-secondary pointer" style="font-size: 13px;" @click="handler('MUSICCONTROL', { event: 'play'})"></i>
                         </div>
-                        <div class="d-flex">
+                        <div class="d-flex align-items">
                             <p class="text-secondary mr-3 p-0 m-0 pointer" @click="redirect('createDiary')">Write diary <i class="fas fa-edit"></i> </p>
-                            <p class="text-secondary p-0 m-0 pointer" @click="redirect('feed')">Feed <i class="fas fa-rss"></i> </p>
+                            <p class="text-secondary p-0 m-0 mr-3 pointer" @click="redirect('feed')">Feed <i class="fas fa-rss"></i> </p>
+                            <p><i class="fas fa-sign-out-alt text-secondary pointer" @click="handler('LOGOUT')"></i></p>
                         </div>
                     </div>
                     <iframe class="video" style="margin-top: 15px" id="profileVideo"  width="100%" loading="lazy"  src=""  frameborder="0" scrolling="no" allowfullscreen></iframe>
@@ -165,11 +166,11 @@
                 </section>
                 </div>
             </div>
-            <!-- <audio id="audio" controls style="display: none;">
-                <source src="https://res.cloudinary.com/yourmysomi/video/upload/v1609326373/Music/Gryffin_-_Just_For_A_Moment_ft._Iselin_mvtoxs.mp3" type="audio/ogg">
-                <source src="https://res.cloudinary.com/yourmysomi/video/upload/v1609326373/Music/Gryffin_-_Just_For_A_Moment_ft._Iselin_mvtoxs.mp3" type="audio/mpeg">
+            <audio id="audio" controls style="display: none;">
+                <source src="https://res.cloudinary.com/dqxhofycj/video/upload/v1609408925/MV_Red_Velvet_%EB%A0%88%EB%93%9C%EB%B2%A8%EB%B2%B3_-_%EB%AF%B8%EB%9E%98_%EC%8A%A4%ED%83%80%ED%8A%B8%EC%97%85_OST_Part.1_START-UP_OST_Part.1_tbqaqs.mp3" type="audio/ogg">
+                <source src="https://res.cloudinary.com/dqxhofycj/video/upload/v1609408925/MV_Red_Velvet_%EB%A0%88%EB%93%9C%EB%B2%A8%EB%B2%B3_-_%EB%AF%B8%EB%9E%98_%EC%8A%A4%ED%83%80%ED%8A%B8%EC%97%85_OST_Part.1_START-UP_OST_Part.1_tbqaqs.mp3" type="audio/mpeg">
                 Your browser does not support the audio element.
-            </audio> -->
+            </audio>
         </div>
 
     </div>
@@ -265,13 +266,13 @@
                             if(audio) {
                                 if(payload.event == "play"){
                                     audio.play();
-                                    audio.volume = 0.2;
+                                    audio.volume = 0.8;
                                     this.playing = true;
                                 }
                                 if(payload.event == "pause"){
                                     if(audio.played) {
                                         audio.pause();
-                                        audio.volume = 0.2;
+                                        audio.volume = 0.8;
                                         this.playing = false;
                                     }
                                 }
