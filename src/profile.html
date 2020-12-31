@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="A vue.js cdn simple diary app, Sign in and start writing your diary">
+        <meta name="keywords" content="Vuejs Framework, CSS, JavaScript, HTML5, UIkit, Bootstrap4">
+        <meta name="author" content="Madridano, Kolya Nikolai M.">
+        <title>Profile</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300&family=Nanum+Gothic&family=Source+Sans+Pro:wght@200&display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+
+        <link rel="stylesheet" href="../src/css/app.css">
+    </head>
+    <style>
+        /* to lower */
+        @media only screen and (max-width: 600px) {
+            .posts {
+                display: flex;
+                flex-direction: column;
+            }
+            .icon {
+                font-size: 10px;
+            }
+            .content, .posted-by {
+                font-size: 13px;
+            }
+            .details {
+                font-size: 12px;
+            }
+            .video {
+                height: 200px;
+            }
+            .quote {
+                font-size: 20px;
+            }
+            .galleryHeaderSection {
+                display: flex;
+                flex-direction: column;
+            }
+            .galleryHeaderSectionInput {
+                display: flex;
+                
+            }
+        }
+        /* to upper */
+        @media only screen and (min-width: 600px) {
+            .galleryHeaderSection{
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+            }
+            .posted-by {
+                font-size: 12px;
+            }
+            .video {
+                height: 345px;
+            }
+            .posts {
+                display: flex;
+                justify-content: space-between;
+            }
+            .icon {
+                font-size: 13px;
+            }
+        }
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
+<body>
+    <div id="app"> 
+        <div class="container">
+            <div class="row justify-content-center mt-3">
+                <div class="col-md-7">
+                    <section>
+                        <section v-if="userIsLoaded" class="d-flex justify-content-between align-items-center">
+                            <div class="mr-3 text-secondary d-flex align-items-center"                                
+                                v-bind:class="{ 'hidden': !playing}" 
+                                style="opacity: 0.7;">
+                                <span>Music is playing</span>
+                                <i class="fas fa-spinner fa-spin ml-2"></i>
+                            </div>
+                            <section class="d-flex align-items-center">
+                                <div>    
+                                    <i v-if="playing" class="fas fa-pause mr-3 uk-text-danger pointer" style="font-size: 20px;" @click="handler('MUSICCONTROL', { event: 'pause'})"></i>
+                                    <i v-if="!playing" class="fas fa-play mr-3 uk-text-primary pointer" style="font-size: 20px;" @click="handler('MUSICCONTROL', { event: 'play'})"></i>
+                               </div>
+                               <span uk-icon="icon: arrow-right; ratio:2" class="pointer"  uk-toggle="target: #offcanvas-push"></span>
+                            </section>
+                        </section>
+                        <section v-if="!userIsLoaded">
+                            <div class="spinner">
+                                <div class="bounce1"></div>
+                                <div class="bounce2"></div>
+                                <div class="bounce3"></div>
+                            </div>
+                        </section>
+                        <section v-if="userIsLoaded">
+                            <h2 class="font-weight-light p-0 m-0 text-dark">{{user?.lastName}}, {{user?.firstName}}</h2>
+                            <div class="text-secondary mt-2 details uk-text-break w-75">{{user?.shortDescription}}</div>
+                            <div class="mt-2">
+                                <div class="details">
+                                    <i class="fas fa-location-arrow mr-1  text-secondary"></i>
+                                    <span class="text-secondary">{{user?.address?.country}}, {{user?.address?.city}}</span>
+                                </div>
+                                <div class="details">
+                                    <i class="fas fa-graduation-cap mr-1  text-secondary"></i>
+                                    <span class="text-secondary">{{user?.course}}</span>
+                                </div>
+                                <div class="details">
+                                    <i class="fas fa-birthday-cake mr-1  text-secondary"></i>
+                                    <span class="text-secondary">{{user?.birthDate}}</span>
+                                </div>
+                            </div>
+                        </section>
+                    </section>
+                    <div id="offcanvas-push" uk-offcanvas="mode: push; overlay: true;flip: true" >
+                        <div class="uk-offcanvas-bar uk-color-primary">
+                            <button class="uk-offcanvas-close" type="button" uk-close></button>
+                            <div style="margin-top: 150px;"></div>
+                            <h5 class="text-white font-weight-light pointer" @click="redirect('createDiary')">
+                                <div class="d-flex justify-content-start">
+                                    <span>Write new diary&nbsp;</span>
+                                    <span uk-icon="icon:file-edit; ratio: 0.9" class="mt-1"></span>
+                                </div>
+                            </h5>
+                            <h5 class="text-white font-weight-light pointer" @click="redirect('feed')">
+                                <div class="d-flex justify-content-start">
+                                    <span>Feed&nbsp;</span>
+                                    <span uk-icon="icon:rss; ratio: 0.9" class="mt-1"></span>
+                                </div>
+                            </h5>
+                            <h3 class="font-weight-light mt-5 mb-2 blockquote quote">"{{quoteOfTheDay}}"</h3>
+                            <h5 class="text-white font-weight-light pointer  mt-5" @click="redirect('updateProfile')">
+                                <div class="d-flex justify-content-start">
+                                    <span>Account settings&nbsp;</span>
+                                    <span uk-icon="icon:cog; ratio: 0.9" class="mt-1"></span>
+                                </div>
+                            </h5>
+                            <h5 class="text-white font-weight-light">
+                                <div class="d-flex justify-content-start pointer" @click="handler('LOGOUT', null)">
+                                    <span>Sign-out&nbsp;</span>
+                                    <span uk-icon="icon: sign-out; ratio: 0.9" class="mt-1"></span>
+                                </div>
+                            </h5>
+                        </div>
+                    </div>
+                    <iframe class="video" style="margin-top: 20px" id="profileVideo"  width="100%" loading="lazy"  src=""  frameborder="0" scrolling="no" allowfullscreen></iframe>
+                    <section v-if="!contentIsReady" style="margin-top: -50px;">
+                        <div class="spinner">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                    </section>
+                    <section v-if="contentIsReady">
+                    <section class="mt-2 d-flex justify-content-end">
+                        <button class="uk-button uk-button-default text-secondary" @click="redirect('createDiary')">Write new diary</button>
+                        <button class="uk-button uk-button-default text-secondary" @click="redirect('feed')">Feed</button>
+                    </section>
+                    <section class="galleryHeaderSection mt-5">
+                        <h1 class="font-weight-light text-center">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span uk-icon="icon: album; ratio: 2"></span>
+                                <span class="ml-2">Gallery</span>
+                            </div>
+                        </h1>
+                        <div class="uk-margin p-4" uk-margin>
+                            <form 
+                                v-bind:class="{ 'd-none': isUploading}" 
+                                @submit.prevent="handler('UPLOADTOCLOUD')" 
+                                enctype="multipart/form-data">
+                               <div class="galleryHeaderSectionInput">
+                                    <div uk-form-custom="target: true">
+                                        <input type="file" name="files[]" accept="image/*">
+                                        <input class="uk-input uk-form-width-medium" type="text" placeholder="Upload Image to gallery" disabled>
+                                    </div>
+                                    <button type="submit" class="uk-button uk-button-default" :disabled="uploadIsDisabled">UPLOAD</button>
+                                </div>
+                            </form>
+                            <section v-if="isUploading">
+                                <div class="d-flex align-items-center text-secondary">
+                                    <span class="mr-1">Uploading</span> 
+                                    <i class="fas fa-spinner fa-spin" ></i>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                    <div class="justify-content-center">
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                            <div v-for="(data, index) in gallery" >
+                                <div class="col">
+                                    <div class="card">
+                                        <span 
+                                            @click="handler('DELETEIMG', { ImgId: data.id })"
+                                            uk-icon="icon: trash; ratio: 1" 
+                                            class="position-absolute m-3 text-danger pointer" 
+                                            style="bottom: 0; right: 0;"></span>
+                                        <img v-bind:src="data.photoUrl" class="gallery-img" loading="lazy"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="diaries.length > 0">
+                        <div v-for="(data, index) in diaries" class="mt-2 p-5">
+                            <div class="posts">
+                                <h6 class="p-0 m-0">
+                                    <div class="d-flex align-items-center">
+                                        <span uk-icon="icon: hashtag"></span> 
+                                        <span><b>{{data.category}}</b></span>
+                                    </div>
+                                </h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-secondary mr-2" style="font-size: 13px;"> 
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-calendar-alt icon" ></i>
+                                            <span>&nbsp;{{data.datePosted}}</span>
+                                        </div>
+                                    </span>
+                                    <span uk-icon="icon: trash; ratio: 0.9" class="text-danger pointer" @click="handler('DELETEDIARY', { id: data.id })"></span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center  posted-by ml-3">
+                                <div class="text-secondary  ml-1">Posted by you</div>
+                            </div>
+                            <p class="text-secondary pl-2 pr-2 pt-3 content ">{{data.content}}</p>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <h4 class="text-center mt-5 blockquote"><em>Oops! It sounds like you don't have any posts, <br>Do you wish to 
+                            <b @click="redirect('createDiary')" class="pointer">write</b> your first diary?</em>
+                        </h4>
+                    </div>
+
+                    <div style="margin-top: 100px"></div>
+                    <p class="text-center">&copy; KOLYA MADRIDANO</p>
+                </section>
+
+                    <div id="snackbar" style="background: #34A853;">
+                        <p class="p-3 m-0 font-weight-light">Uploaded successfully!</p>
+                    </div>
+                    <div id="snackbarDeleted" style="background: #EA4335; color: white;">
+                        <p class="p-3 m-0 font-weight-light">Deleted successfully!</p>
+                    </div>
+                </div>
+            </div>
+      
+            <audio id="audio" controls style="display: none;">
+                <source src="https://res.cloudinary.com/yourmysomi/video/upload/v1609326373/Music/Gryffin_-_Just_For_A_Moment_ft._Iselin_mvtoxs.mp3" type="audio/ogg">
+                <source src="https://res.cloudinary.com/yourmysomi/video/upload/v1609326373/Music/Gryffin_-_Just_For_A_Moment_ft._Iselin_mvtoxs.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            local: null,
+            data: {
+                baseUrl: 'https://www.diaryapi.somee.com/',
+                cloudinaryUrl:"https://api.cloudinary.com/v1_1/yourmysomi/image/upload",
+                user: {},
+                diaries: [],
+                quoteOfTheDay: null,
+                uploadedBuffer: {},
+                gallery: [],
+                uploadIsDisabled: false,
+                isUploading: false,
+                playMusic: true,
+                playing: false,
+                youTubeVideoIsLoaded: true,
+                userIsLoaded: false,
+                contentIsReady: false
+            },
+            methods: {
+                redirect: function(type) {
+                    switch(true) {
+                        case type === "feed":
+                            return location.href = "feed.html";
+                        case type === "createDiary":
+                            return location.href = "create-diary.html";
+                        case type === "updateProfile":
+                            return location.href="../src/update-profile.html";
+                        default: 
+                            return;
+                    }
+                },
+                handler: async function(type, payload) {
+                    switch(true) {
+                        case type === "LOGOUT":
+                            localStorage.removeItem('diaryLocalStorage');
+                            location.href = "../index.html";
+                        break;
+                        case type === "UPLOADTOCLOUD": 
+                            this.uploadIsDisabled = true;
+                            this.isUploading = true;
+                            const form = document.querySelector("form");
+                            const files = document.querySelector("[type=file]").files;
+                            const formData = new FormData();
+                            for (let i = 0; i < files.length; i++) {
+                                let file = files[i];
+                                formData.append("file", file);
+                                formData.append("upload_preset", "snoecp7q");
+                                axios.post(this.cloudinaryUrl, formData)
+                                    .then(res => {
+                                        this.uploadedBuffer = res.data;
+                                        console.log(res.data);
+                                        if(this.uploadedBuffer) {
+                                            let payload = {
+                                                specialId: this.local.userId,
+                                                postedBy: this.user.firstName,
+                                                photoUrl: this.uploadedBuffer.secure_url,
+                                                datePosted: moment(Date.now()).format('LLL')
+                                            }
+                                            axios.post(this.baseUrl + 'api/gallery/upload',payload)
+                                                .then(res => {
+                                                    this.handler("FETCHGALLERY");
+                                                    this.isUploading = false;
+                                                    this.uploadIsDisabled = false;
+                                                    let snackbar = document.getElementById("snackbar");
+                                                        snackbar.className = "show";
+                                                        setTimeout(() => { 
+                                                            snackbar.className = snackbar.className.replace("show", ""); 
+                                                        }, 1500);
+                                                })
+                                                .catch(err => this.uploadIsDisabled = false)
+                                            }
+                                    })
+                                    .catch(err => console.log(err))
+                            }
+                        break;
+                        case type === "MUSICCONTROL": 
+                            let audio = document.getElementById("audio");
+                            if(audio) {
+                                if(payload.event == "play"){
+                                    audio.play();
+                                    audio.volume = 0.2;
+                                    this.playing = true;
+                                }
+                                if(payload.event == "pause"){
+                                    if(audio.played) {
+                                        audio.pause();
+                                        audio.volume = 0.2;
+                                        this.playing = false;
+                                    }
+                                }
+                            }
+                        break;
+                        case type === "DELETEDIARY":
+                            axios.delete(this.baseUrl + `api/diary/remove/` + payload.id)
+                                .then(res => {
+                                    this.handler("FETCHDIARIES")
+                                    let snackbar = document.getElementById("snackbarDeleted");
+                                        snackbar.className = "show";
+                                        setTimeout(() => { 
+                                            snackbar.className = snackbar.className.replace("show", ""); 
+                                        }, 3000);
+                                })
+                                .catch(err => console.log(err))
+                        break;
+                        case type === "DELETEIMG": 
+                            axios.delete(this.baseUrl + `api/gallery/remove/${payload.ImgId}`)
+                            .then(res => {
+                                this.handler("FETCHGALLERY");
+                                let snackbar = document.getElementById("snackbarDeleted");
+                                    snackbar.className = "show";
+                                    setTimeout(() => { 
+                                        snackbar.className = snackbar.className.replace("show", ""); 
+                                    }, 3000);
+                            })
+                            .catch(err => console.log(err));
+                        break;
+                        case type === "FETCHGALLERY":
+                            if(this.local.userId) {
+                                await axios.get(this.baseUrl + `api/gallery/findBySpecialId/${this.local?.userId}`)
+                                        .then(res => this.gallery = res.data.reverse())
+                                        .catch(err => console.log(err))
+                            }
+                        break;
+                        case type === "FETCHQUOTEOFTHEDAY":
+                            await axios.get("https://quotes.rest/qod?language=en", { headers: { "accept": "application/json", "X-TheySaidSo-Api-Secret": "kolya"  } })
+                                    .then(res => this.quoteOfTheDay = res.data.contents.quotes[0].quote)
+                                    .catch(err => console.log(err));
+                        break;
+                        case type === "FETCHPROFILE":
+                            if(this.local.userId) {
+                                await axios.get(this.baseUrl+`api/profile/findBySpecialId/${this.local?.userId}`)
+                                    .then(res => {
+                                        this.user = res.data[0];
+                                        document.title = this.user?.firstName + " " + this.user?.lastName;
+                                        this.userIsLoaded = true;
+                                    }).catch(err => console.log(err));
+                            }
+                        break;
+                        case type === "FETCHDIARIES":
+                            if(this.local.userId) {
+                                axios.get(this.baseUrl+`api/diary/findBySpecialId/${this.local?.userId}`)
+                                    .then(res => this.diaries = res.data.reverse())
+                                    .catch(err => console.error(err))
+                            }
+                        break;
+                        case type === "LOADYOUTUBEVIDEO": 
+                            let youtubeVideoUrl = this.user?.media.video;
+                            let youtubeVideoId = youtubeVideoUrl?.slice(youtubeVideoUrl.indexOf("?v=") + 3);
+                            let targetIframe = document.getElementById('profileVideo');
+                                targetIframe.src = `https://www.youtube.com/embed/${youtubeVideoId}`; 
+                        break;
+                        default :
+                            return null;
+                    }
+                },
+                componentDidMount: async function(){
+                    this.handler("FETCHPROFILE").then(res => {
+                        this.handler("MUSICCONTROL", { event: "play"})
+                        this.handler("LOADYOUTUBEVIDEO");
+                        setTimeout(() => {
+                            this.handler("FETCHGALLERY");
+                            this.handler("FETCHDIARIES");
+                            this.handler("FETCHQUOTEOFTHEDAY");
+                            this.contentIsReady = true;
+                        }, 2000);
+                    });
+                }
+            },
+            mounted: function() {
+                if(localStorage.diaryLocalStorage) {
+                    this.local = JSON.parse(localStorage.diaryLocalStorage);
+                    this.componentDidMount();
+                } else  location.href = "../index.html";
+            }
+        })
+    </script>
+</body>
+</html>

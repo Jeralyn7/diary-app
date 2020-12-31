@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A vue.js cdn simple diary app, Sign in and start writing your diary">
+    <meta name="keywords" content="Vuejs Framework, CSS, JavaScript, HTML5, UIkit, Bootstrap4">
+    <meta name="author" content="Madridano, Kolya Nikolai M.">
+    <title>Create new account</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/css/uikit.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        /* to lower */
+        @media only screen and (max-width: 600px) {
+           .buttons  {
+               display: flex;
+               justify-content: end;
+               flex-direction: column;
+
+           }
+        }
+        /* to upper */
+        @media only screen and (min-width: 600px) {
+            .buttons  {
+               display: flex;
+               justify-content: center;
+               flex-direction: row;
+           }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row justify-content-center" style="margin-top: 100px;">
+                <div class="col-xl-5 col-lg-5 col-md-7">
+                    <h2 class="font-weight-light text-secondary">
+                        <div class="d-flex align-items-center">
+                            <span uk-icon="icon: cog; ratio: 1.5"></span>
+                            <span class="ml-2">Profile Settings</span>
+                        </div>
+                    </h2>
+                    <form @submit.prevent="handleUpdate">
+                        <div class="uk-grid-small mt-5" uk-grid>
+                            <div class="uk-width-1-2@s ">
+                                <input 
+                                    class="uk-input uk-form-width-large" 
+                                    type="text" 
+                                    minlength="2"
+                                    maxlength="30"
+                                    placeholder="Firstname" 
+                                    v-model="createPayload.firstName" required />
+                            </div>
+                            <div class="uk-width-1-2@s">
+                                <input 
+                                    class="uk-input uk-form-width-large" 
+                                    type="text" 
+                                    minlength="2"
+                                    maxlength="30"
+                                    placeholder="Lastname" 
+                                    v-model="createPayload.lastName" required/> 
+                            </div>
+                        </div>
+                        <div class="uk-grid-small mt-2" uk-grid>
+                            <div class="uk-width-1-2@s ">
+                                <div class="uk-margin">
+                                    <div class="uk-form-controls">
+                                        <select class="uk-select" id="form-stacked-select"  v-model="createPayload.gender">
+                                            <option disabled :value="null">Gender</option>
+                                            <option>Male</option>
+                                            <option>Female</option>
+                                            <option>Rather not to say</option>
+                                        </select>
+                                    </div>
+                                </div>                        
+                            </div>
+                            <div class="uk-width-1-2@s">
+                                <input 
+                                    class="uk-input uk-form-width-large" 
+                                    type="date" 
+                                    min="1950-01-01"
+                                    placeholder="Lastname" 
+                                    v-model="createPayload.birthDate"
+                                    required/>
+                            </div>
+                        </div>
+                        <div class="uk-margin mt-2">
+                            <textarea 
+                                class="uk-textarea" 
+                                rows="6" 
+                                minlength="20"
+                                maxlength="100"
+                                placeholder="Describe your self" 
+                                v-model.trim="createPayload.shortDescription" required></textarea>
+                        </div>
+                        <div class="uk-grid-small mt-2" uk-grid>
+                            <div class="uk-width-1-2@s ">
+                                <input 
+                                    class="uk-input uk-form-width-large" 
+                                    type="text" 
+                                    maxlength="50"
+                                    placeholder="Country" 
+                                    v-model.trim="createPayload.country" required/>
+                            </div>
+                            <div class="uk-width-1-2@s">
+                                <input 
+                                    class="uk-input uk-form-width-large" 
+                                    type="text" 
+                                    maxlength="50"
+                                    placeholder="City/Town" 
+                                    v-model.trim="createPayload.city" required/>
+                            </div>
+                        </div>
+                        <div class="uk-inline mt-2">
+                            <input 
+                                class="uk-input uk-form-width-large" 
+                                type="text" 
+                                maxlength="50"
+                                placeholder="Course"
+                                v-model.trim="createPayload.course" required/>
+                        </div>
+                        <div class="uk-inline mt-2">
+                            <span 
+                                class="uk-form-icon" 
+                                v-bind:class="{ 'text-danger': youTubeLinkIsInvalid}" 
+                                uk-icon="icon: youtube"></span>
+                            <input 
+                                class="uk-input uk-form-width-large" 
+                                v-bind:class="{ 'uk-form-danger': youTubeLinkIsInvalid}"
+                                type="text" 
+                                placeholder="YouTube video link that describes you"
+                                v-model.trim="createPayload.video" required/>
+                        </div>
+                        <div class="buttons mt-5">
+                            <button type="submit" class="uk-button uk-button-default mr-2 text-secondary" @click="redirectToProfile">return to profile</button>
+                            <button type="submit" class="uk-button uk-button-primary" :disabled="isDisabled">
+                                Save profile 
+                                <i class="fas fa-spinner fa-spin" v-if="loading"></i>
+                            </button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.5/dist/js/uikit-icons.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            local: null,
+
+            data: {
+                baseUrl: 'https://www.diaryapi.somee.com/',
+                loading: false,
+                isDisabled: false,
+                user: {},
+                createPayload: {
+                    firstName: null,
+                    lastName: null,
+                    gender: null,
+                    shortDescription: null,
+                    course: null,
+                    country: null,
+                    city: null,
+                    music: null,
+                    video: null,
+                    birthDate: null,
+                },
+                youTubeLinkIsInvalid: false
+            },
+            methods: {
+                handleUpdate: function() {
+                    var youtubeRegexp = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+                    let youTubeLink = this.createPayload.video;
+
+                    if(youTubeLink.match(youtubeRegexp) && this.user.id) {
+                        this.loading = true;
+                        this.isDisabled = true;
+                        this.youTubeLinkIsInvalid = false;
+
+                        let payload = {
+                            id: this.user.id,
+                            specialId: this.local.userId,
+                            firstName: this.createPayload.firstName,
+                            lastName: this.createPayload.lastName,
+                            gender: this.createPayload.gender ??= "Rather not to say",
+                            shortDescription: this.createPayload.shortDescription ??= "This user is crazy",
+                            course: this.createPayload.course,
+                            address: {
+                                country: this.createPayload.country,
+                                city: this.createPayload.city
+                            },
+                            media: {
+                                music: null,
+                                video: youTubeLink
+                            },
+                            birthDate: moment(Date.parse(this.createPayload.birthDate)).format('LL')
+                        }
+                        axios.put(this.baseUrl + 'api/profile/update', payload)
+                            .then(res => {
+                                console.log(payload);
+                                this.loading = false;
+                            })
+                            .catch(err => this.isDisabled=false);
+                    }  else this.youTubeLinkIsInvalid = true;
+                },
+                redirectToProfile: function() {
+                    return location.href="profile.html";
+                },
+                componentDidMount: function() {
+                    axios.get(this.baseUrl+`api/profile/findBySpecialId/${this.local?.userId}`)
+                        .then(res => {
+                            this.user = res.data[0];
+                            this.createPayload.firstName = this.user.firstName;
+                            this.createPayload.lastName = this.user.lastName;
+                            this.createPayload.gender = this.user.gender;
+                            this.createPayload.shortDescription = this.user.shortDescription;
+                            this.createPayload.city = this.user.address.city;
+                            this.createPayload.country = this.user.address.country;
+                            this.createPayload.course = this.user.course;
+                            this.createPayload.video = this.user.media.video;
+                            function formatDate(value) {
+                                let givenDate = new Date(value);
+                                let year = givenDate.getFullYear().toString();
+                                let fixedMonth = givenDate.getMonth() + 1;
+                                let month = fixedMonth < 10 ? `0${fixedMonth.toString()}` : fixedMonth.toString();
+                                let day = givenDate.getDate() < 10 ? `0${givenDate.getDate().toString()}` : givenDate.getDate().toString();
+                                let formattedDate = `${year}-${month}-${day}`
+                                return formattedDate;
+                               
+                            }
+                            this.createPayload.birthDate = formatDate(this.user.birthDate);
+
+                        }).catch(err => console.log(err));
+                }
+            },
+            mounted: function() {
+                if(localStorage.diaryLocalStorage) {
+                    this.local = JSON.parse(localStorage.diaryLocalStorage);
+                    this.componentDidMount();
+                } else  location.href = "../index.html";
+                
+            }
+        })
+    </script>
+</body>
+</html>
